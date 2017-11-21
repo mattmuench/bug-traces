@@ -1,0 +1,438 @@
+[root@gl-t1 ~]# echo "##### UNSUCESSFUL deployment using gdeploy #######"
+##### UNSUCESSFUL deployment using gdeploy #######
+[root@gl-t1 ~]# cat gdeploy-ctdb-priv.cfg 
+[hosts]
+gl-t1
+gl-t2
+gl-t3
+#172.21.116.18
+#172.21.116.19
+#172.21.116.20
+
+[volume]
+action=create
+volname=ctdb
+transport=tcp
+replica_count=3
+force=yes
+brick_dirs=/rhgs/ctdb
+
+[ctdb]
+action=setup
+public_address=172.21.116.151/24 enp0s8,172.21.116.152/24 enp0s8,172.21.116.153/24 enp0s8
+#ctdb_nodes=172.21.116.18,172.21.116.19,172.21.116.20
+#ctdb_nodes=gl-t1,gl-t2,gl-t3
+volname=ctdb
+[root@gl-t1 ~]# gdeploy -c gdeploy-ctdb-priv.cfg 
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [start/stop/restart/reload services] *****************************************************************************************************
+ok: [gl-t1] => (item=glusterd)
+ok: [gl-t3] => (item=glusterd)
+ok: [gl-t2] => (item=glusterd)
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=0    unreachable=0    failed=0   
+gl-t2                      : ok=1    changed=0    unreachable=0    failed=0   
+gl-t3                      : ok=1    changed=0    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Create the brick dirs, skips if present] ************************************************************************************************
+ok: [gl-t2] => (item=/rhgs/ctdb)
+ok: [gl-t3] => (item=/rhgs/ctdb)
+ok: [gl-t1] => (item=/rhgs/ctdb)
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=0    unreachable=0    failed=0   
+gl-t2                      : ok=1    changed=0    unreachable=0    failed=0   
+gl-t3                      : ok=1    changed=0    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Creates a Trusted Storage Pool] *********************************************************************************************************
+changed: [gl-t1]
+
+TASK [Pause for a few seconds] ****************************************************************************************************************
+Pausing for 5 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [gl-t1]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=2    changed=1    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Creates a volume] ***********************************************************************************************************************
+fatal: [gl-t1]: FAILED! => {"changed": false, "failed": true, "msg": "volume create: ctdb: failed: Volume ctdb already exists\n", "rc": 1}
+	to retry, use: --limit @/tmp/tmpyUmGR5/gluster-volume-create.retry
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=0    changed=0    unreachable=0    failed=1   
+
+Ignoring errors...
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Starts a volume] ************************************************************************************************************************
+changed: [gl-t1]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Creates /etc/ctdb directory] ************************************************************************************************************
+ok: [gl-t2]
+ok: [gl-t1]
+ok: [gl-t3]
+
+TASK [Clean up /etc/ctdb/nodes] ***************************************************************************************************************
+changed: [gl-t3]
+changed: [gl-t2]
+changed: [gl-t1]
+
+TASK [Clean /etc/ctdb/public_addresses] *******************************************************************************************************
+changed: [gl-t1]
+changed: [gl-t3]
+changed: [gl-t2]
+
+TASK [Create /etc/ctdb/nodes] *****************************************************************************************************************
+changed: [gl-t2]
+changed: [gl-t3]
+changed: [gl-t1]
+
+TASK [Create /etc/ctdb/public_addresses] ******************************************************************************************************
+changed: [gl-t2]
+changed: [gl-t3]
+changed: [gl-t1]
+
+TASK [Add confs to /etc/ctdb/nodes] ***********************************************************************************************************
+changed: [gl-t1]
+changed: [gl-t2]
+changed: [gl-t3]
+
+TASK [Add confs to /etc/ctdb/public_addresses] ************************************************************************************************
+changed: [gl-t3]
+changed: [gl-t1]
+changed: [gl-t2]
+
+TASK [Add volume name to ctdb setup/teardown scripts] *****************************************************************************************
+ok: [gl-t2] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [gl-t1] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [gl-t3] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [gl-t2] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+ok: [gl-t3] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+ok: [gl-t1] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+
+TASK [Enable clustering in Samba] *************************************************************************************************************
+ok: [gl-t1]
+ok: [gl-t2]
+ok: [gl-t3]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=9    changed=6    unreachable=0    failed=0   
+gl-t2                      : ok=9    changed=6    unreachable=0    failed=0   
+gl-t3                      : ok=9    changed=6    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Stops a volume] *************************************************************************************************************************
+changed: [gl-t1]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Starts a volume] ************************************************************************************************************************
+changed: [gl-t1]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Enable or disable services] *************************************************************************************************************
+changed: [gl-t2] => (item=ctdb)
+changed: [gl-t3] => (item=ctdb)
+changed: [gl-t1] => (item=ctdb)
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=1    changed=1    unreachable=0    failed=0   
+gl-t2                      : ok=1    changed=1    unreachable=0    failed=0   
+gl-t3                      : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [start/stop/restart/reload services] *****************************************************************************************************
+failed: [gl-t3] (item=ctdb) => {"failed": true, "item": "ctdb", "msg": "Unable to start service ctdb: Job for ctdb.service failed because the control process exited with error code. See \"systemctl status ctdb.service\" and \"journalctl -xe\" for details.\n"}
+failed: [gl-t2] (item=ctdb) => {"failed": true, "item": "ctdb", "msg": "Unable to start service ctdb: Job for ctdb.service failed because the control process exited with error code. See \"systemctl status ctdb.service\" and \"journalctl -xe\" for details.\n"}
+failed: [gl-t1] (item=ctdb) => {"failed": true, "item": "ctdb", "msg": "Unable to start service ctdb: Job for ctdb.service failed because the control process exited with error code. See \"systemctl status ctdb.service\" and \"journalctl -xe\" for details.\n"}
+	to retry, use: --limit @/tmp/tmpyUmGR5/service_management.retry
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=0    changed=0    unreachable=0    failed=1   
+gl-t2                      : ok=0    changed=0    unreachable=0    failed=1   
+gl-t3                      : ok=0    changed=0    unreachable=0    failed=1   
+
+Ignoring errors...
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Add confs to glusterd.vol] **************************************************************************************************************
+ok: [gl-t1]
+
+TASK [Restart glusterd services] **************************************************************************************************************
+changed: [gl-t1]
+
+TASK [Create a new user] **********************************************************************************************************************
+skipping: [gl-t1]
+
+TASK [Set smb password] ***********************************************************************************************************************
+skipping: [gl-t1]
+
+PLAY RECAP ************************************************************************************************************************************
+gl-t1                      : ok=2    changed=1    unreachable=0    failed=0   
+
+[root@gl-t1 ~]# cat /etc/ctdb/public_addresses 
+172.21.116.151/24 enp0s8
+172.21.116.152/24 enp0s8
+172.21.116.153/24 enp0s8
+[root@gl-t1 ~]# cat /etc/ctdb/nodes
+gl-t1
+gl-t2
+gl-t3
+[root@gl-t1 ~]# tail -20 /var/log/log.ctdb
+...
+2017/11/21 00:44:12.235065 ctdbd[7040]: CTDB starting on node
+2017/11/21 00:44:12.236956 ctdbd[7040]: ../ctdb/common/system_util.c:123 Failed to translate gl-t1 into sin_addr
+2017/11/21 00:44:12.236973 ctdbd[7040]: Failed to load nodes file "/etc/ctdb/nodes"
+
+
+
+[root@gl-t1 ~]# echo "##### SUCESSFUL deployment using gdeploy #######"
+##### SUCESSFUL deployment using gdeploy #######
+[root@gl-t1 ~]# vi gdeploy-ctdb-priv.cfg 
+[root@gl-t1 ~]# cat gdeploy-ctdb-priv.cfg 
+[hosts]
+#gl-t1
+#gl-t2
+#gl-t3
+172.21.116.18
+172.21.116.19
+172.21.116.20
+
+[volume]
+action=create
+volname=ctdb
+transport=tcp
+replica_count=3
+force=yes
+brick_dirs=/rhgs/ctdb
+
+[ctdb]
+action=setup
+public_address=172.21.116.151/24 enp0s8,172.21.116.152/24 enp0s8,172.21.116.153/24 enp0s8
+#ctdb_nodes=172.21.116.18,172.21.116.19,172.21.116.20
+#ctdb_nodes=gl-t1,gl-t2,gl-t3
+volname=ctdb
+[root@gl-t1 ~]# gdeploy -c gdeploy-ctdb-priv.cfg 
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [start/stop/restart/reload services] *****************************************************************************************************
+ok: [172.21.116.19] => (item=glusterd)
+ok: [172.21.116.20] => (item=glusterd)
+ok: [172.21.116.18] => (item=glusterd)
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=0    unreachable=0    failed=0   
+172.21.116.19              : ok=1    changed=0    unreachable=0    failed=0   
+172.21.116.20              : ok=1    changed=0    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Create the brick dirs, skips if present] ************************************************************************************************
+ok: [172.21.116.18] => (item=/rhgs/ctdb)
+ok: [172.21.116.20] => (item=/rhgs/ctdb)
+ok: [172.21.116.19] => (item=/rhgs/ctdb)
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=0    unreachable=0    failed=0   
+172.21.116.19              : ok=1    changed=0    unreachable=0    failed=0   
+172.21.116.20              : ok=1    changed=0    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Creates a Trusted Storage Pool] *********************************************************************************************************
+changed: [172.21.116.18]
+
+TASK [Pause for a few seconds] ****************************************************************************************************************
+Pausing for 5 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=2    changed=1    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Creates a volume] ***********************************************************************************************************************
+fatal: [172.21.116.18]: FAILED! => {"changed": false, "failed": true, "msg": "volume create: ctdb: failed: Volume ctdb already exists\n", "rc": 1}
+	to retry, use: --limit @/tmp/tmpiOHlRG/gluster-volume-create.retry
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=0    changed=0    unreachable=0    failed=1   
+
+Ignoring errors...
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Starts a volume] ************************************************************************************************************************
+changed: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Creates /etc/ctdb directory] ************************************************************************************************************
+ok: [172.21.116.20]
+ok: [172.21.116.19]
+ok: [172.21.116.18]
+
+TASK [Clean up /etc/ctdb/nodes] ***************************************************************************************************************
+changed: [172.21.116.18]
+changed: [172.21.116.20]
+changed: [172.21.116.19]
+
+TASK [Clean /etc/ctdb/public_addresses] *******************************************************************************************************
+changed: [172.21.116.20]
+changed: [172.21.116.18]
+changed: [172.21.116.19]
+
+TASK [Create /etc/ctdb/nodes] *****************************************************************************************************************
+changed: [172.21.116.20]
+changed: [172.21.116.19]
+changed: [172.21.116.18]
+
+TASK [Create /etc/ctdb/public_addresses] ******************************************************************************************************
+changed: [172.21.116.19]
+changed: [172.21.116.20]
+changed: [172.21.116.18]
+
+TASK [Add confs to /etc/ctdb/nodes] ***********************************************************************************************************
+changed: [172.21.116.18]
+changed: [172.21.116.20]
+changed: [172.21.116.19]
+
+TASK [Add confs to /etc/ctdb/public_addresses] ************************************************************************************************
+changed: [172.21.116.19]
+changed: [172.21.116.18]
+changed: [172.21.116.20]
+
+TASK [Add volume name to ctdb setup/teardown scripts] *****************************************************************************************
+ok: [172.21.116.19] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [172.21.116.20] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [172.21.116.18] => (item=/var/lib/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh)
+ok: [172.21.116.18] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+ok: [172.21.116.19] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+ok: [172.21.116.20] => (item=/var/lib/glusterd/hooks/1/start/post/S29CTDBsetup.sh)
+
+TASK [Enable clustering in Samba] *************************************************************************************************************
+ok: [172.21.116.19]
+ok: [172.21.116.20]
+ok: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=9    changed=6    unreachable=0    failed=0   
+172.21.116.19              : ok=9    changed=6    unreachable=0    failed=0   
+172.21.116.20              : ok=9    changed=6    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Stops a volume] *************************************************************************************************************************
+changed: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Starts a volume] ************************************************************************************************************************
+changed: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [Enable or disable services] *************************************************************************************************************
+changed: [172.21.116.19] => (item=ctdb)
+changed: [172.21.116.20] => (item=ctdb)
+changed: [172.21.116.18] => (item=ctdb)
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=1    unreachable=0    failed=0   
+172.21.116.19              : ok=1    changed=1    unreachable=0    failed=0   
+172.21.116.20              : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [gluster_servers] ************************************************************************************************************************
+
+TASK [start/stop/restart/reload services] *****************************************************************************************************
+changed: [172.21.116.20] => (item=ctdb)
+changed: [172.21.116.19] => (item=ctdb)
+changed: [172.21.116.18] => (item=ctdb)
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=1    changed=1    unreachable=0    failed=0   
+172.21.116.19              : ok=1    changed=1    unreachable=0    failed=0   
+172.21.116.20              : ok=1    changed=1    unreachable=0    failed=0   
+
+
+PLAY [master] *********************************************************************************************************************************
+
+TASK [Add confs to glusterd.vol] **************************************************************************************************************
+ok: [172.21.116.18]
+
+TASK [Restart glusterd services] **************************************************************************************************************
+changed: [172.21.116.18]
+
+TASK [Create a new user] **********************************************************************************************************************
+skipping: [172.21.116.18]
+
+TASK [Set smb password] ***********************************************************************************************************************
+skipping: [172.21.116.18]
+
+PLAY RECAP ************************************************************************************************************************************
+172.21.116.18              : ok=2    changed=1    unreachable=0    failed=0   
+
+[root@gl-t1 ~]# rpm -qa |grep gdeploy
+gdeploy-2.0.2-14.el7rhgs.noarch
+[root@gl-t1 ~]# cat /etc/ctdb/nodes
+172.21.116.18
+172.21.116.19
+172.21.116.20
+[root@gl-t1 ~]# cat /etc/ctdb/public_addresses 
+172.21.116.151/24 enp0s8
+172.21.116.152/24 enp0s8
+172.21.116.153/24 enp0s8
+[root@gl-t1 ~]# 
